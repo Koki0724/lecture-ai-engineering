@@ -172,6 +172,7 @@ def test_model_reproducibility(sample_data, preprocessor):
         predictions1, predictions2
     ), "モデルの予測結果に再現性がありません"
 
+
 def test_feature_importance_balance(train_model):
     """モデルが1つの特徴量に極端に依存していないかを検証"""
     model, _, _ = train_model
@@ -187,4 +188,6 @@ def test_feature_importance_balance(train_model):
 
     # 最大の特徴量が全体の80%以上を占めていれば警告（極端すぎる）
     max_ratio = np.max(importances) / np.sum(importances)
-    assert max_ratio < 0.8, f"特定の特徴量に依存しすぎています（最大割合: {max_ratio:.2f}）"
+    assert (
+        max_ratio < 0.8
+    ), f"特定の特徴量に依存しすぎています（最大割合: {max_ratio:.2f}）"
