@@ -171,3 +171,20 @@ def test_model_reproducibility(sample_data, preprocessor):
     assert np.array_equal(
         predictions1, predictions2
     ), "モデルの予測結果に再現性がありません"
+
+def test_feature_importance_balance(train_model):
+    """モデルが1つの特徴量に極端に依存していないかを検証"""
+    model, _, _ = train_model
+
+    # パイプラインの中から分類器を取り出す
+    classifier = model.named_steps["classifier"]
+
+    # 特徴量の重要度を取得（RandomForest 限定）
+    if not hasattr(classifier, "feature_importances_"):
+        pytest.skip("このモデルは feature_importances_ を持っていません")
+
+    importances = classifier.feature_importances_
+
+    # 最大の特徴量が全体の80%以上を占めていれば警告（極端すぎる）
+    max_ratio = np.max(importances) / np.sum(importances)
+    assert max_ratio < 0.8, f"特定の特徴量に依存しすぎています（最大割合: {max_ratio:.2f}）"
